@@ -1,0 +1,8 @@
+Assessment:
+Patient reports wheezing and mild fatigue. No fever or cough.
+Family history:
+Mother has asthma.
+Medications:
+Patient takes albuterol.
+Plan:
+Return in two weeks. Call if rash develops.

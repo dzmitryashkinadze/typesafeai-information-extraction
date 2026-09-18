@@ -1,0 +1,64 @@
+{
+  "ruleset_version": "1.0.0",
+  "metadata": {
+    "track": "A",
+    "layer": "full",
+    "ruleset_version": "1.0.0",
+    "resource_sha256": "d214cbb51802a72b79191ad34c9e2d47e6d87df8269604114176d2cd7202c30f",
+    "fhir_release": "4.3.0",
+    "implementation_sha256": "ab4ea52aadaeeec57efda60795257d250ef4ed1b47d2b5abf69b743dd3ead93c",
+    "context_rule_sha256": "012e99d570c26525fa4fb0959ffd3dd23c5dda0baa4fefca4ed4a02036a56f83",
+    "versions": {
+      "medspacy": "1.3.1",
+      "spacy": "3.8.2",
+      "en-core-web-sm": "3.8.0",
+      "fhir-resources": "8.3.0",
+      "typesafeai-information-extraction-demo": "0.1.0"
+    },
+    "pipes": [
+      "tok2vec",
+      "tagger",
+      "parser",
+      "attribute_ruler",
+      "lemmatizer",
+      "medspacy_target_matcher",
+      "medspacy_sectionizer",
+      "medspacy_context"
+    ],
+    "concepts": 61,
+    "target_rules": 89,
+    "context_rules": 123,
+    "default_context_rules": 102,
+    "dependency_rules": 4
+  },
+  "corpus_version": "1.0.1",
+  "corpus_sha256": "8f79b6fd5bd6c0765c78ca468d491e6dea3afd5d310a3af62384223bea6a507a",
+  "lock_sha256": "733c9671efa49bd568acb990d802560b462a0e3240be9b7af0c83878b4ff1fe6",
+  "split_cases": {
+    "development": 70,
+    "validation": 14,
+    "evaluation": 42,
+    "challenge": 8
+  },
+  "freeze_policy": "Extractor source frozen before evaluation; two challenge timing labels corrected after the first run, with no extractor changes. Author-visible synthetic benchmark.",
+  "initial_corpus_version": "1.0.0",
+  "initial_corpus_sha256": "30c3755ad79da43dd9d8f3b856e3a3a479965f32f5776bfd05aa1143c1a95a52",
+  "gold_corrections_after_first_run": [
+    {
+      "case_id": "challenge-6",
+      "mention": "first MS",
+      "field": "temporality",
+      "initial": "unknown",
+      "corrected": "current",
+      "reason": "The abbreviation aliases the explicitly current mitral stenosis finding in the same sentence."
+    },
+    {
+      "case_id": "challenge-7",
+      "mention": "metformin",
+      "field": "temporality",
+      "initial": "unknown",
+      "corrected": "historical",
+      "reason": "Was increased describes a past medication change, not an unspecified or future event."
+    }
+  ]
+}

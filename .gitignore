@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+.runtime/
+
+# Local configuration and generated reports
+.env
+output/
+reports/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
