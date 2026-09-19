@@ -19,4 +19,4 @@ uv run typesafeai-information-extraction-demo \
   "Nodes: -PERSON (human) -COLOR (color); EDGES: -LIKES (PERSON -> COLOR)"
 ```
 
-The command prints the extracted JSON and creates `graph.html`; open it in any browser to drag, zoom, and inspect the graph. Use `--output another-name.html` to choose another path. Node and edge names must be uppercase identifiers. Every edge declares its allowed direction as `(SOURCE_NODE -> TARGET_NODE)`, which avoids testing impossible node pairs.
+The command prints the extracted JSON and creates `graph.html`; open it in any browser to drag, zoom, and inspect the graph. Each node includes its zero-based `token_index`. Use `--max-distance 20` to reject edge candidates whose nodes are more than 20 tokens apart, and `--output another-name.html` to choose another path. Node and edge names must be uppercase identifiers. Every edge declares its allowed direction as `(SOURCE_NODE -> TARGET_NODE)`, which avoids testing impossible node pairs.
