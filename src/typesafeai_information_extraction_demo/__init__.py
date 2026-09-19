@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import re
-from itertools import permutations, product
+from itertools import product
 from pathlib import Path
 
 import spacy
@@ -15,7 +15,7 @@ def main() -> None:
     load_dotenv()
     parser = argparse.ArgumentParser(description="Extract and visualize a schema-constrained graph")
     parser.add_argument("text")
-    parser.add_argument("schema", help='e.g. "Nodes: -PERSON (human) -COLOR (color); EDGES: -LIKES"')
+    parser.add_argument("schema", help='e.g. "Nodes: -PERSON (human) -COLOR (color); EDGES: -LIKES (PERSON -> COLOR)"')
     parser.add_argument("-o", "--output", default="graph.html")
     args = parser.parse_args()
 
@@ -23,13 +23,14 @@ def main() -> None:
     if len(halves) != 2:
         parser.error("schema must contain EDGES:")
     parse = lambda value: dict(re.findall(r"-([A-Z][A-Z0-9_]*)\s*(?:\(([^)]*)\))?", value))
-    node_types, edge_types = parse(halves[0]), parse(halves[1])
-    if not node_types or not edge_types:
-        parser.error("schema needs at least one -NODE and one -EDGE")
+    node_types = parse(halves[0])
+    edge_types = re.findall(r"-([A-Z][A-Z0-9_]*)\s*\(\s*([A-Z][A-Z0-9_]*)\s*->\s*([A-Z][A-Z0-9_]*)\s*\)", halves[1])
+    if not node_types or not edge_types or any(source not in node_types or target not in node_types for _, source, target in edge_types):
+        parser.error("schema needs -NODE (description) and -EDGE (SOURCE_NODE -> TARGET_NODE) definitions")
 
     doc = spacy.load("en_core_web_sm")(args.text)
     candidates = list(dict.fromkeys([e.text for e in doc.ents] + [t.text for t in doc if t.pos_ in {"PROPN", "NOUN", "ADJ"}]))
-    client = TypeSafeClient(api_key=os.environ["API_JEV"])
+    client = TypeSafeClient(api_key=os.getenv("API_JEV") or os.environ["API_JEF"])
     state = {"text": args.text, "schema": args.schema}
     result = client.system_one(state, {
         f"n{i}": Choice(
@@ -39,12 +40,12 @@ def main() -> None:
     })
     nodes = [(name, result.answers[f"n{i}"].choice) for i, name in enumerate(candidates) if result.answers[f"n{i}"].choice != "NONE"]
 
-    possible = list(product(permutations(nodes, 2), edge_types))
+    possible = [(a, edge, b) for edge, source, target in edge_types for a, b in product(nodes, repeat=2) if a[1] == source and b[1] == target and a != b]
     result = client.system_one(state, {
         f"e{i}": Noul(instructions=f"The text asserts as true that {a[0]!r} {edge} {b[0]!r}. Resolve references, but answer false for negated, hypothetical, or uncertain claims.")
-        for i, ((a, b), edge) in enumerate(possible)
+        for i, (a, edge, b) in enumerate(possible)
     }) if possible else None
-    edges = [(a, edge, b) for i, ((a, b), edge) in enumerate(possible) if result.answers[f"e{i}"].noul >= .7]
+    edges = [(a, edge, b) for i, (a, edge, b) in enumerate(possible) if result.answers[f"e{i}"].noul >= .7]
     graph = {"nodes": [{"name": n, "type": t} for n, t in nodes], "edges": [{"source": a[0], "type": e, "target": b[0]} for a, e, b in edges]}
     print(json.dumps(graph, indent=2))
 
