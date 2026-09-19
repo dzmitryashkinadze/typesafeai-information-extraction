@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "en-core-web-sm",
+    "pydantic>=2",
     "python-dotenv>=1.2.3",
     "pyvis>=0.3.2",
     "spacy>=3.8.16",
